@@ -1,0 +1,67 @@
+---
+title: "Analysis of my commute"
+output: html_document
+---
+
+Commuting from Pasadena to Santa Monica
+==================
+
+The goal of this exploration is to analyze my commute,
+and find useful patterns to minimize travel time.
+
+```{r echo=FALSE}
+# read data
+data <- read.csv("data/data.csv", header=TRUE,sep="\t" )
+data$dow <- weekdays(as.Date(data$dt))
+
+# find dates bound for data
+dtf <- levels(data$dt)
+dtfl <- sort(dtf)
+```
+
+I gathered data from `r  dtfl[2]` to  `r  tail(dtfl,1)`.
+
+```{r echo=FALSE}
+
+ isWeekend <- Vectorize(function(s) {
+  return( s == "Saturday" || s == "Sunday")
+})
+
+plotBarPlot <- function( d, title) {
+  boxplot(travelDurationTraffic/60  ~ hour, 
+        xlab = "Hour in the day", ylab = "Travel time (minutes)",
+        data = d,main= title)
+}
+
+plotWeek <- function(data, title) {
+  dayFactor = factor ( data$dow, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+# abbrevviate day names for labels
+abbDays <- lapply( levels(dayFactor), function(s) {substring(s,0,3)} )
+  
+boxplot( travelDurationTraffic/60 ~ dayFactor, data = data, xlabel="Day of Week",
+         names = abbDays,
+         ylabel="Travel time (minutes)", main = title)
+}
+
+
+
+fromhome <- data[data$route =="home-to-work",]
+fromwork <- data[data$route =="work-to-home",]
+
+weekdayh <- subset(fromhome ,  !isWeekend(dow) )
+weekendh <- subset(fromhome ,  isWeekend(dow) )
+
+weekdayw <- subset(fromwork ,  !isWeekend(dow) )
+weekendw <- subset(fromwork ,  isWeekend(dow) )
+
+plotBarPlot(weekdayh,"Travel time on weekdays from Pasadena to Santa Monica")
+plotBarPlot(weekdayw,"Travel time on weekdays from Santa Monica to Pasadena")
+plotBarPlot(weekendh,"Travel time on weekends from Pasadena to Santa Monica")
+plotBarPlot(weekendw,"Travel time on weekends from Santa Monica to Pasadena")
+
+plotWeek(fromhome,"Travel time by day of week (from Pasadena)")
+plotWeek(fromwork,"Travel time by day of week (from Santa Monica)")
+
+```
+
+
