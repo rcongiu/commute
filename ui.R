@@ -24,12 +24,14 @@ shinyUI(fluidPage(
         selectInput("dow", label = "Day of the week", 
                     choices = list("Monday", "Tuesday", "Wednesday", 
                                    "Thursday", "Friday", "Saturday", "Sunday" ), selected = weekdays(Sys.Date()))
-      )
+      ),
+      div("Select the day of the week (defaults to today) and the direction of your commute. The graph on the right will update automatically")
    
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
+      div("The graph below shows a boxplot with the distribution of commute times during the selected day of week."),
       plotOutput("distPlot")
       #textOutput("mytext")
     )
