@@ -1,0 +1,112 @@
+---
+title       : Commute Analysis
+subtitle    : Trying to minimizing time on the road
+author      : Roberto Congiu rcongiu@yahoo.com
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+
+```{r echo=FALSE}
+# read data
+data <- read.csv("../data/data.csv", header=TRUE,sep="\t" )
+data$dow <- weekdays(as.Date(data$dt))
+
+# find dates bound for data
+dtf <- levels(data$dt)
+dtfl <- sort(dtf)
+
+ isWeekend <- Vectorize(function(s) {
+  return( s == "Saturday" || s == "Sunday")
+})
+
+plotBarPlot <- function( d, title) {
+  boxplot(travelDurationTraffic/60  ~ hour, 
+        xlab = "Hour in the day", ylab = "Travel time (minutes)",
+        data = d,main= title)
+}
+
+plotWeek <- function(data, title) {
+  dayFactor = factor ( data$dow, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+# abbrevviate day names for labels
+abbDays <- lapply( levels(dayFactor), function(s) {substring(s,0,3)} )
+  
+boxplot( travelDurationTraffic/60 ~ dayFactor, data = data, xlabel="Day of Week",
+         names = abbDays,
+         ylab="Travel time (minutes)", main = title)
+}
+
+
+
+fromhome <- data[data$route =="home-to-work",]
+fromwork <- data[data$route =="work-to-home",]
+
+weekdayh <- subset(fromhome ,  !isWeekend(dow) )
+weekendh <- subset(fromhome ,  isWeekend(dow) )
+
+weekdayw <- subset(fromwork ,  !isWeekend(dow) )
+weekendw <- subset(fromwork ,  isWeekend(dow) )
+
+```
+
+## Commute from Pasadena to Santa Monica
+
+* about 25 miles
+* goes through two of the most congested Los Angeles Freeways, the 110 and the 10
+* takes 30 minutes without traffic
+* can take up to 2 hours on the bad day/time
+* significally different depending on the day of the week
+* we want to analyze both going to work, and going back home, and find optimal working hours
+* use Bing API to sample traffic estimates every 5 minutes, for 3 weeks.
+
+
+--- .class #id 
+
+## Traffic by day of week
+
+* we can see there's lots of variance on weekdays
+
+```{r echo=FALSE , fig.height=10, fig.width=12}
+par(mfrow=c(2,2))
+plotWeek(fromhome,"Pasadena -> Santa Monica")
+plotWeek(fromwork,"Santa Monica -> Pasadena")
+```
+
+---
+
+## Let's see how it changes on a weekday
+
+
+```{r echo=FALSE , fig.height=10, fig.width=12}
+par(mfrow=c(2,2))
+plotBarPlot(weekdayh,"Pasadena to Santa Monica")
+plotBarPlot(weekdayw,"Santa Monica to Pasadena")
+```
+
+---
+
+## how about the weekend ?
+
+```{r echo=FALSE , fig.height=10, fig.width=12}
+par(mfrow=c(2,2))
+plotBarPlot(weekendh,"Pasadena to Santa Monica")
+plotBarPlot(weekendw,"Santa Monica to Pasadena")
+```
+
+What about dynamically estimating my commute based on 
+the day of the week and the direction ?
+
+
+---
+## You can do that on my shiny app!
+
+https://rcongiu.shinyapps.io/commute/
+
+
+
+
