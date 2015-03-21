@@ -55,7 +55,6 @@ the day of the week and the direction ?
 
 https://rcongiu.shinyapps.io/commute/
 
-<iframe src = 'https://rcongiu.shinyapps.io/commute/' height='600px'></iframe>
 
 
 

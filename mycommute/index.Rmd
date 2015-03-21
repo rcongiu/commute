@@ -14,7 +14,7 @@ knit        : slidify::knit2slides
 
 ```{r echo=FALSE}
 # read data
-data <- read.csv("../data/data.csv", header=TRUE,sep="\t" )
+data <- read.csv("data.csv", header=TRUE,sep="\t" )
 data$dow <- weekdays(as.Date(data$dt))
 
 # find dates bound for data
